@@ -1,0 +1,94 @@
+# ----- Global --------------------------------------------------------------------------------------
+namespace: linktracker-uat
+baseUrl: http://localhost:8080
+
+# ----- Image pull policy ---------------------------------------------------------------------------
+imagePullPolicy: Never
+
+# ----- Backend -------------------------------------------------------------------------------------
+backend:
+  image: linktracker-backend:latest
+  replicas: 2
+  port: 8000
+  resources:
+    requests: 
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 6
+      targetCPUUtilizationPercentage: 60
+
+# ----- Worker -------------------------------------------------------------------------------------
+worker:
+  image: linktracker-worker:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+
+# ----- Frontend -----------------------------------------------------------------------------------
+frontend:
+  image: linktracker-frontend:latest
+  replicas: 1
+  port: 80
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "32Mi"
+    limits:
+      cpu: "100m"
+      memory: "64Mi"
+
+# ----- Postgres -----------------------------------------------------------------------------------
+postgres:
+  image: postgres:16-alpine
+  port: 5432
+  storage: "1Gi"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
+
+# ----- Redis --------------------------------------------------------------------------------------
+redis:
+  image: redis:7-alpine
+  port: 6379
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+
+# ----- Secrets ------------------------------------------------------------------------------------
+secrets:
+  postgresUser: bGlua3RyYWNrZXI=
+  postgresPassword: bGlua3RyYWNrZXI=
+  postgresDb: bGlua3RyYWNrZXI=
+
+# ----- Config-Map ---------------------------------------------------------------------------------
+configmap:
+  dbUrl: "postgresql://linktracker:linktracker@postgres:5432/linktracker"
+  redisUrl: "redis://redis:6379/0"
+
+# ----- Ingress ------------------------------------------------------------------------------------
+ingress:
+  className: nginx
+  host: ""
+
+# ----- Network Policy -----------------------------------------------------------------------------
+networkpolicy:
+  enabled: true
