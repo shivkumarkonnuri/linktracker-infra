@@ -1,0 +1,19 @@
+# UAT overrides — Kind cluster on local machine
+namespace: linktracker-uat
+baseUrl: "http://localhost:9080"
+imagePullPolicy: IfNotPresent
+
+configmap:
+  dbUrl: "postgresql://linktracker:linktracker@postgres:5432/linktracker"
+  redisUrl: "redis://redis:6379/0"
+
+backend:
+  replicas: 2
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 60
+
+networkPolicy:
+  enabled: true

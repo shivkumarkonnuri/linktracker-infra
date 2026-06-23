@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linktracker-config
+  namespace: {{ .Values.namespace }}
+data:
+  DATABASE_URL: {{ .Values.configmap.dbUrl | quote }}
+  REDIS_URL: {{ .Values.configmap.redisUrl | quote }}
+  BASE_URL: {{ .Values.baseUrl | quote }}

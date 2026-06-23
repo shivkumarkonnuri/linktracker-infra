@@ -1,0 +1,18 @@
+# Ignore the local provider cache and modules directory
+.terraform/
+
+# Ignore lock file if you want to always download latest providers (Optional)
+# Most teams commit this file. Remove '#' below if you prefer to ignore it:
+# .terraform.lock.hcl
+
+# Ignore your secrets and environment variables file
+terraform.tfvars
+
+# Ignore any generated state files if you run local tests
+*.tfstate
+*.tfstate.*
+
+# Ignore crash logs
+crash.log
+
+hashicorp-linktracker-keyring.gpg

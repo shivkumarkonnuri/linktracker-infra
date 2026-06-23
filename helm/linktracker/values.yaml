@@ -1,6 +1,6 @@
 # ----- Global --------------------------------------------------------------------------------------
 namespace: linktracker-uat
-baseUrl: http://localhost:8080
+baseUrl: "http://localhost:9080"
 
 # ----- Image pull policy ---------------------------------------------------------------------------
 imagePullPolicy: Never
@@ -17,11 +17,11 @@ backend:
     limits:
       cpu: "500m"
       memory: "256Mi"
-    hpa:
-      enabled: true
-      minReplicas: 2
-      maxReplicas: 6
-      targetCPUUtilizationPercentage: 60
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 60
 
 # ----- Worker -------------------------------------------------------------------------------------
 worker:
@@ -90,5 +90,5 @@ ingress:
   host: ""
 
 # ----- Network Policy -----------------------------------------------------------------------------
-networkpolicy:
+networkPolicy:
   enabled: true
