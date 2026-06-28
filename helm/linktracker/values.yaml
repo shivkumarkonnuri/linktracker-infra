@@ -86,9 +86,15 @@ configmap:
 
 # ----- Ingress ------------------------------------------------------------------------------------
 ingress:
+  enabled: true
   className: nginx
   host: ""
 
 # ----- Network Policy -----------------------------------------------------------------------------
 networkPolicy:
   enabled: true
+
+# ----- Gateway API (prod only) --------------------------------------------------------------------
+gateway:
+  enabled: false
+  className: gke-l7-regional-external-managed

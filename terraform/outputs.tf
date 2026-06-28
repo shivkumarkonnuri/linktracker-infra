@@ -14,10 +14,6 @@ output "cluster_endpoint" {
   sensitive   = true
 }
 
-output "artifact_registry_url" {
-  description = "Base URL for pushing/pulling Docker images, e.g. <region>-docker.pkg.dev/<project>/<repo>"
-  value       = "${var.region}-docker.pkg.dev/${var.project_id}/${var.artifact_repo_name}"
-}
 
 output "vpc_name" {
   description = "VPC network name"

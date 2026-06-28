@@ -1,0 +1,18 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: backend-healthcheck-policy
+  namespace: {{ .Values.namespace }}
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: {{ .Values.backend.port }}
+        requestPath: /health
+  targetRef:
+    group: ""
+    kind: Service
+    name: backend
+{{- end }}

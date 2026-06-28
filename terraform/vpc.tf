@@ -82,3 +82,16 @@ resource "google_compute_firewall" "allow_health_checks" {
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]
 }
   
+
+# --- Proxy-only subnet: required by GCP regional external Application Load Balancers
+#     (gke-l7-regional-external-managed). This is NOT for your app traffic --
+#     it's a dedicated subnet GCP's managed Envoy proxies use internally.
+#     Without this, the Gateway can never reach PROGRAMMED: True.
+resource "google_compute_subnetwork" "proxy_only_subnet" {
+  name          = "${var.vpc_name}-proxy-only"
+  ip_cidr_range = "10.10.32.0/24"
+  region        = var.region
+  network       = google_compute_network.vpc.id
+  purpose       = "REGIONAL_MANAGED_PROXY"
+  role          = "ACTIVE"
+}

@@ -75,8 +75,3 @@ variable "max_node_count" {
   default     = 3
 }
 
-variable "artifact_repo_name" {
-  description = "Name of the Artifact Registry Docker repository"
-  type        = string
-  default     = "linktracker"
-}

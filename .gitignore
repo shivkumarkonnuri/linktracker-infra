@@ -16,3 +16,4 @@ terraform.tfvars
 crash.log
 
 hashicorp-linktracker-keyring.gpg
+*values*

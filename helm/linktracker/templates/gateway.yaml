@@ -1,0 +1,58 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: linktracker-gateway
+  namespace: {{ .Values.namespace }}
+spec:
+  gatewayClassName: {{ .Values.gateway.className }}
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: 
+  name: linktracker-route
+  namespace: {{ .Values.namespace }}
+spec:
+  parentRefs:
+    - name: linktracker-gateway
+  rules:
+    # /api/* -> backend
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: backend
+          port: {{ .Values.backend.port }}
+    # /s/* -> backend (short-link redirects)
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /s/
+      backendRefs:
+        - name: backend
+          port: {{ .Values.backend.port }}
+    # everything else -> frontend
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: frontend
+          port: {{ .Values.frontend.port }}
+{{- end }}
