@@ -1,0 +1,28 @@
+---
+- name: Check if ingress-nginx namespace exists
+  command: kubectl get namespace {{ ingress_namespace }}
+  register: ingress_ns
+  failed_when: false
+  changed_when: false
+
+- name: Install ingress-nginx
+  command: kubectl apply -f {{ ingress_manifest }}
+  when: ingress_ns.rc != 0
+
+- name: Wait for ingress controller deployment
+  command: >
+    kubectl wait
+    --namespace {{ ingress_namespace }}
+    --for=condition=available
+    deployment/ingress-nginx-controller
+    --timeout=300s
+  changed_when: false
+
+- name: Show ingress pods
+  command: kubectl get pods -n {{ ingress_namespace }}
+  register: ingress_pods
+  changed_when: false
+
+- name: Display ingress pods
+  debug:
+    var: ingress_pods.stdout_lines

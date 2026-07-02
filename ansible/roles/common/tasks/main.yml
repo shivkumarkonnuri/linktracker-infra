@@ -1,0 +1,109 @@
+---
+- name: Check if Docker is installed
+  command: docker --version
+  register: docker_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install Docker
+  become: true
+  apt:
+    name: docker.io
+    state: present
+    update_cache: true
+  when: docker_check.rc != 0
+
+- name: Add current user to docker group
+  become: true
+  user:
+    name: "{{ ansible_facts.user_id }}"
+    groups: docker
+    append: true
+
+- name: Start and enable Docker service
+  become: true
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Check if kubectl is installed
+  command: kubectl version --client
+  register: kubectl_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install kubectl
+  when: kubectl_check.rc != 0
+  block:
+    - name: Download kubectl binary
+      get_url:
+        url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+        dest: /tmp/kubectl
+        mode: '0755'
+
+    - name: Move kubectl to /usr/local/bin
+      become: true
+      copy:
+        src: /tmp/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+        remote_src: true
+
+- name: Check if helm is installed
+  command: helm version
+  register: helm_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install helm
+  when: helm_check.rc != 0
+  block:
+    - name: Download helm install script
+      get_url:
+        url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        dest: /tmp/get-helm.sh
+        mode: '0755'
+
+    - name: Run helm install script
+      become: true
+      command: /tmp/get-helm.sh
+
+- name: Check if kind is installed
+  command: kind version
+  register: kind_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install kind
+  when: kind_check.rc != 0
+  block:
+    - name: Download kind binary
+      get_url:
+        url: "https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64"
+        dest: /tmp/kind
+        mode: '0755'
+
+    - name: Move kind to /usr/local/bin
+      become: true
+      copy:
+        src: /tmp/kind
+        dest: /usr/local/bin/kind
+        mode: '0755'
+        remote_src: true
+
+- name: Show installed tool versions
+  command: "{{ item }}"
+  loop:
+    - docker --version
+    - kubectl version --client
+    - helm version
+    - kind version
+  register: versions
+  changed_when: false
+  ignore_errors: true
+
+- name: Print versions
+  debug:
+    msg: "{{ item.stdout }}"
+  loop: "{{ versions.results }}"

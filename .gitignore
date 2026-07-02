@@ -1,19 +1,75 @@
-# Ignore the local provider cache and modules directory
+# =============================================================================
+# Terraform
+# =============================================================================
+
 .terraform/
 
-# Ignore lock file if you want to always download latest providers (Optional)
-# Most teams commit this file. Remove '#' below if you prefer to ignore it:
+# Commit this file for reproducible provider versions.
+# Uncomment if you intentionally don't want to track it.
 # .terraform.lock.hcl
 
-# Ignore your secrets and environment variables file
 terraform.tfvars
-
-# Ignore any generated state files if you run local tests
 *.tfstate
 *.tfstate.*
-
-# Ignore crash logs
 crash.log
 
+# =============================================================================
+# Ansible
+# =============================================================================
+
+# Retry files
+*.retry
+
+# Ansible log
+ansible.log
+
+# Local Galaxy collections (if installed in the repo)
+collections/
+
+# Vault password files
+.vault_pass
+vault_pass.txt
+
+# =============================================================================
+# Secrets
+# =============================================================================
+
+# GPG keyring
 hashicorp-linktracker-keyring.gpg
+
+# Environment files
+.env
+.env.*
+
+# =============================================================================
+# Kubernetes / Helm
+# =============================================================================
+
+# Local values files (keep committed values.yaml if you have one)
 *values*
+
+# =============================================================================
+# Python
+# =============================================================================
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# =============================================================================
+# IDEs
+# =============================================================================
+
+.vscode/
+.idea/
+
+# =============================================================================
+# OS / Editor
+# =============================================================================
+
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

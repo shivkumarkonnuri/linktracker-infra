@@ -1,0 +1,19 @@
+# --- Kind Cluster ---
+kind_cluster_name: linktracker-uat
+kind_kubeconfig: "{{ lookup('env', 'HOME') }}/Documents/linktracker/k8s/kind-cluster.yaml"
+
+# --- Helm ---
+helm_release_name: linktracker
+helm_chart_path: "{{ lookup('env', 'HOME') }}/Documents/linktracker-infra/helm/linktracker"
+helm_values_base: "{{ helm_chart_path }}/values.yaml"
+helm_values_uat: "{{ helm_chart_path }}/values-uat.yaml"
+helm_namespace: linktracker-uat
+
+# --- Versions ---
+kubectl_version: "v1.36.2"
+helm_version: "v3.17.0"
+kind_version: "v0.29.0"
+
+# Ingress
+ingress_namespace: ingress-nginx
+ingress_manifest: https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
