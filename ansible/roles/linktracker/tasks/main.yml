@@ -1,0 +1,34 @@
+---
+- name: Ensure application namespace exists
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ helm_namespace }}"
+    state: present
+
+- name: Deploy or upgrade LinkTracker Helm release
+  kubernetes.core.helm:
+    release_name: "{{ helm_release_name }}"
+    chart_ref: "{{ helm_chart_path }}"
+    release_namespace: "{{ helm_namespace }}"
+    create_namespace: true
+    values_files:
+      - "{{ helm_values_base }}"
+      - "{{ helm_values_uat }}"
+    wait: true
+    timeout: 600s
+    state: present
+  register: helm_result
+
+- name: Show Helm module result
+  debug:
+    var: helm_result
+
+- name: Show installed Helm releases
+  command: helm list -n {{ helm_namespace }}
+  register: helm_list
+  changed_when: false
+
+- name: Display Helm releases
+  debug:
+    var: helm_list.stdout_lines

@@ -7,3 +7,4 @@
     - common
     - kind_cluster
     - ingress
+    - linktracker

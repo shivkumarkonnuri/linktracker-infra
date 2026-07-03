@@ -17,3 +17,5 @@ kind_version: "v0.29.0"
 # Ingress
 ingress_namespace: ingress-nginx
 ingress_manifest: https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+ansible_python_interpreter: "{{ lookup('env', 'HOME') }}/Documents/linktracker-infra/.venv/bin/python"
