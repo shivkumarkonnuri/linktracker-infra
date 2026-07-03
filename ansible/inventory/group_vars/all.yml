@@ -1,6 +1,7 @@
 # --- Kind Cluster ---
 kind_cluster_name: linktracker-uat
-kind_kubeconfig: "{{ lookup('env', 'HOME') }}/Documents/linktracker/k8s/kind-cluster.yaml"
+kind_config: "{{ lookup('env', 'HOME') }}/Documents/linktracker/k8s/kind-cluster.yaml"
+kind_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube/config"
 
 # --- Helm ---
 helm_release_name: linktracker
@@ -14,8 +15,9 @@ kubectl_version: "v1.36.2"
 helm_version: "v3.17.0"
 kind_version: "v0.29.0"
 
-# Ingress
+# --- Ingress ---
 ingress_namespace: ingress-nginx
 ingress_manifest: https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
-ansible_python_interpreter: "{{ lookup('env', 'HOME') }}/Documents/linktracker-infra/.venv/bin/python"
+# --- Python ---
+ansible_python_interpreter: /usr/bin/python3

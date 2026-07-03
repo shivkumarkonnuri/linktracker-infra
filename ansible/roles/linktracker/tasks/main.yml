@@ -16,11 +16,11 @@
       - "{{ helm_values_base }}"
       - "{{ helm_values_uat }}"
     wait: true
-    timeout: 600s
+    timeout: "600s"
     state: present
   register: helm_result
 
-- name: Show Helm module result
+- name: Show Helm release result
   debug:
     var: helm_result
 
@@ -32,3 +32,46 @@
 - name: Display Helm releases
   debug:
     var: helm_list.stdout_lines
+
+- name: Wait for all pods to be ready
+  command: >
+    kubectl wait --for=condition=Ready pods
+    --all -n {{ helm_namespace }}
+    --timeout=300s
+  register: pod_wait
+  changed_when: false
+
+- name: Show pod status
+  command: kubectl get pods -n {{ helm_namespace }}
+  register: pod_status
+  changed_when: false
+
+- name: Display pod status
+  debug:
+    var: pod_status.stdout_lines
+
+- name: Get NodePort for frontend
+  command: >
+    kubectl get svc frontend -n {{ helm_namespace }}
+    -o jsonpath='{.spec.ports[0].nodePort}'
+  register: frontend_port
+  changed_when: false
+  ignore_errors: true
+
+- name: Smoke test — backend health check
+  uri:
+    url: "http://localhost:9080/api/health"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: health_check
+  retries: 5
+  delay: 10
+  until: health_check.status == 200
+  ignore_errors: true
+
+- name: Show smoke test result
+  debug:
+    msg: >
+      Smoke test {{ 'PASSED ✅' if health_check.status == 200
+      else 'FAILED ❌ — check ingress and backend logs' }}

@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Uninstall LinkTracker Helm release
+      kubernetes.core.helm:
+        release_name: "{{ helm_release_name }}"
+        release_namespace: "{{ helm_namespace }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete linktracker-uat namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ helm_namespace }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete Kind cluster
+      command: kind delete cluster --name {{ kind_cluster_name }}
+      register: kind_delete
+      changed_when: kind_delete.rc == 0
+      ignore_errors: true
+
+    - name: Confirm cluster deleted
+      command: kind get clusters
+      register: remaining_clusters
+      changed_when: false
+
+    - name: Show remaining clusters
+      debug:
+        msg: "Remaining Kind clusters: {{ remaining_clusters.stdout | default('none') }}"

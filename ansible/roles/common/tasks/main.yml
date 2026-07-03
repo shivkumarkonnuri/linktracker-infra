@@ -5,27 +5,36 @@
   ignore_errors: true
   changed_when: false
 
-- name: Install Docker
-  become: true
-  apt:
-    name: docker.io
-    state: present
-    update_cache: true
+- name: Install Docker and configure group
   when: docker_check.rc != 0
+  block:
+    - name: Install Docker
+      become: true
+      apt:
+        name: docker.io
+        state: present
+        update_cache: true
 
-- name: Add current user to docker group
-  become: true
-  user:
-    name: "{{ ansible_facts.user_id }}"
-    groups: docker
-    append: true
+    - name: Add current user to docker group
+      become: true
+      user:
+        name: "{{ ansible_facts.user_id }}"
+        groups: docker
+        append: true
 
-- name: Start and enable Docker service
+    - name: Start and enable Docker service
+      become: true
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+- name: Ensure Docker service is running
   become: true
   systemd:
     name: docker
     state: started
-    enabled: true
+  changed_when: false
 
 - name: Check if kubectl is installed
   command: kubectl version --client

@@ -15,7 +15,7 @@
   command: kind export kubeconfig --name {{ kind_cluster_name }}
   changed_when: false
 
-- name: Switch kubectl context to Kind
+- name: Switch kubectl context to Kind cluster
   command: kubectl config use-context kind-{{ kind_cluster_name }}
   changed_when: false
 
