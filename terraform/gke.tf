@@ -32,6 +32,8 @@ resource "google_container_cluster" "primary" {
   # endpoint is "public" — GKE still firewalls the control plane by IP.
   # var.my_ip_cidr is your laptop's public IP, set in terraform.tfvars.
   master_authorized_networks_config {
+    gcp_public_cidrs_access_enabled = true
+    private_endpoint_enforcement_enabled = false
     cidr_blocks {
       cidr_block   = var.my_ip_cidr
       display_name = "shivkumar-laptop"
