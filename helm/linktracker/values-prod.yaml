@@ -1,0 +1,33 @@
+# PROD overrides - GKE cluster
+namespace: linktracker-prod
+baseUrl: "http://35.209.253.233"
+imagePullPolicy: Always
+
+backend:
+  image: shivkumarkonnuri/linktracker:backend
+  replicas: 2
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 60
+
+worker:
+  image: shivkumarkonnuri/linktracker:worker
+
+frontend:
+  image: shivkumarkonnuri/linktracker:frontend
+
+configmap:
+  dbUrl: "postgresql://linktracker:linktracker@postgres:5432/linktracker"
+  redisUrl: "redis://redis:6379/0"
+
+ingress:
+  enabled: false   # disable nginx Ingress in prod
+
+gateway:
+  enabled: true
+  className: gke-l7-regional-external-managed
+
+networkPolicy:
+  enabled: true
