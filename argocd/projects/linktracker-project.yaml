@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: linktracker
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+
+spec:
+  description: Linktracker URL shortner project
+
+  # Only allow deployments from this specific Git repo
+  sourceRepos:
+    - https://github.com/shivkumarkonnuri/linktracker-infra
+
+  # Only allow deploying to the linktracker-prod namespace on the local cluster
+  destinations:
+    - namespace: linktracker-prod
+      server: https://kubernets.default.svc
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+
+  # Cluster-scoped resources this project can manage
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+
+  # Namespace-scoped resources this project can manage
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # Deny all cluster resources
+  clusterResourceBlacklist: []
+
+  # Source namespace restrictions (ArgoCD v2.5+)
+  sourceNamespaces:
+    - argocd

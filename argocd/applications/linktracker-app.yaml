@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linktracker
+  namespace: argocd
+
+  # Ensures ArgoCD cleans up all child resources when this Application is deleted
+  finalizers:
+    - resource-finalizer.argocd.argoproj.io
+  labels:
+    app: linktracker
+    env: prod
+
+spec:
+  # Reference the App Project we created
+  project: linktracker
+
+  # Source Helm chart in the infra repo
+  source:
+    repoUrl: https://github.com/shivkumarkonnuri/linktracker-infra
+    targetRevision: main
+    path: helm/linktracker
+
+    helm:
+      # Base values + prod overrides ( same as what we used manually )
+      valueFiles:
+        - values.yaml
+        - values-prod.yaml
+
+  # Destination: prod namespace on the in-cluster GKE cluster
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: linktracker-prod
+
+  #Sync Policy - fully automated GitOps
+  syncPolicy:
+    automated:
+      prune: true        # delete resources removed from Git
+      selfHeal: true     # revert manual changes made directly to the  cluster
+
+    syncOptions:
+      - CreateNamespace=true # create linktracker-prod if it doesn't exist
+      - PrunePropogationPolicy=foreground
+      - PruneLast=true
+
+    # Retry failed syncs automatically
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Health check settings
+  revisionHistoryLimit: 3

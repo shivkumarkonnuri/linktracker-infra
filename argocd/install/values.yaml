@@ -1,0 +1,88 @@
+#Argo CD Helm values for linktracker prod deployment on GKE
+#Chart: argo/argo-cd version 7.x
+
+global:
+  # GKE compatible resource settings
+  nodeSelector: {}
+  tolerations: {}
+
+server:
+  # Expose Argo CD UI via GKE Loadbalancer
+  service:
+    type: LoadBalancer
+    annotations:
+      cloud.google.com/load-balancer-type: "External"
+  # Disable TLS termination at ArgoCD level
+  # (GKE LB handles TLS in production - for now HTTP is fine for portfolio)
+  extraArgs:
+    - --insecure
+
+  # Resource limits for e2-standard-2 nodes
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  # ArgoCD UI config
+  config:
+    # Allow sync from linktracker-infra repo
+    repositories: |
+      - url: https://github.com/shivkumarkonnuri/linktracker-infra
+        type: git
+
+  rbacConfig:
+    policy.default: role:readonly
+    policy.csv: |
+      p, role:admin, applications, *, */*, allow
+      p, role:admin, clusters, *, *, allow
+      p, role:admin, repositories, *, *, allow
+      g, admin, role:admin
+
+applicationSet:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+controller:
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+repoServer:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+# Disable dex (SSO) — not needed for portfolio
+dex:
+  enabled: false
+
+# Enable metrics for future observability week
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false  # enable in Week 8 when Prometheus is set up
