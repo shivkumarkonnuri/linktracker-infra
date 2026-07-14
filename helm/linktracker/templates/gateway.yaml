@@ -40,9 +40,6 @@ metadata:
 spec:
   parentRefs:
     - name: linktracker-gateway
-      {{- if .Values.gateway.tls.enabled }}
-      sectionName: https
-      {{- end }}
   {{- if .Values.gateway.tls.enabled }}
   hostnames:
     - {{ .Values.gateway.hostname | quote }}
