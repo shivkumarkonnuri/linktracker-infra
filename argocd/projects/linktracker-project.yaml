@@ -25,6 +25,12 @@ spec:
     - group: ''
       kind: Namespace
 
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+
+    - group: cert-manager.io
+      kind: ClusterIssuer
+
   # Namespace-scoped resources this project can manage
   namespaceResourceWhitelist:
     - group: '*'
