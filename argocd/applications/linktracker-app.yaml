@@ -17,7 +17,7 @@ spec:
 
   # Source Helm chart in the infra repo
   source:
-    repoUrl: https://github.com/shivkumarkonnuri/linktracker-infra
+    repoURL: https://github.com/shivkumarkonnuri/linktracker-infra
     targetRevision: main
     path: helm/linktracker
 

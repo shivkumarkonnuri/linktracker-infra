@@ -4,6 +4,10 @@ kind: Gateway
 metadata:
   name: linktracker-gateway
   namespace: {{ .Values.namespace }}
+  {{- if .Values.gateway.staticIpName }}
+  annotations:
+    networking.gke.io/addresses: {{ .Values.gateway.staticIpName | quote }}
+  {{- end }}
 spec:
   gatewayClassName: {{ .Values.gateway.className }}
   listeners:
@@ -13,19 +17,37 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
-
+    {{- if .Values.gateway.tls.enabled }}
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.gateway.hostname | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ .Values.gateway.tls.secretName }}
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Same
+    {{- end }}
 ---
-
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
-metadata: 
+metadata:
   name: linktracker-route
   namespace: {{ .Values.namespace }}
 spec:
   parentRefs:
     - name: linktracker-gateway
+      {{- if .Values.gateway.tls.enabled }}
+      sectionName: https
+      {{- end }}
+  {{- if .Values.gateway.tls.enabled }}
+  hostnames:
+    - {{ .Values.gateway.hostname | quote }}
+  {{- end }}
   rules:
-    # /api/* -> backend
     - matches:
         - path:
             type: PathPrefix
@@ -39,7 +61,6 @@ spec:
       backendRefs:
         - name: backend
           port: {{ .Values.backend.port }}
-    # /s/* -> backend (short-link redirects)
     - matches:
         - path:
             type: PathPrefix
@@ -47,7 +68,6 @@ spec:
       backendRefs:
         - name: backend
           port: {{ .Values.backend.port }}
-    # everything else -> frontend
     - matches:
         - path:
             type: PathPrefix

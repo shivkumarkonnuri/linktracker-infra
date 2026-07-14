@@ -28,6 +28,12 @@ ingress:
 gateway:
   enabled: true
   className: gke-l7-regional-external-managed
+  staticIpName: linktracker-gateway-ip
+  hostname: "35-209-77-35.nip.io"   # e.g. 35-209-77-35.nip.io — nip.io also supports dash format
+  tls:
+    enabled: true
+    secretName: linktracker-tls
+    issuerName: letsencrypt-prod
 
 networkPolicy:
   enabled: true

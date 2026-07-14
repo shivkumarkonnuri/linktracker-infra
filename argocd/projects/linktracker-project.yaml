@@ -16,7 +16,7 @@ spec:
   # Only allow deploying to the linktracker-prod namespace on the local cluster
   destinations:
     - namespace: linktracker-prod
-      server: https://kubernets.default.svc
+      server: https://kubernetes.default.svc
     - namespace: argocd
       server: https://kubernetes.default.svc
 

@@ -46,7 +46,6 @@ hashicorp-linktracker-keyring.gpg
 # =============================================================================
 
 # Local values files (keep committed values.yaml if you have one)
-*values*
 
 # =============================================================================
 # Python

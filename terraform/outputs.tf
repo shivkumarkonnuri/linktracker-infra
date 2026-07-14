@@ -19,3 +19,7 @@ output "vpc_name" {
   description = "VPC network name"
   value       = google_compute_network.vpc.name
 }
+
+output "gateway_static_ip" {
+  value = google_compute_address.gateway_ip.address
+}

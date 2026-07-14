@@ -1,0 +1,14 @@
+{{- if .Values.gateway.tls.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.gateway.tls.secretName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ .Values.gateway.tls.secretName }}
+  issuerRef:
+    name: {{ .Values.gateway.tls.issuerName }}
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.gateway.hostname | quote }}
+{{- end }}

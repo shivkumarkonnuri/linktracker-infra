@@ -95,3 +95,10 @@ resource "google_compute_subnetwork" "proxy_only_subnet" {
   purpose       = "REGIONAL_MANAGED_PROXY"
   role          = "ACTIVE"
 }
+
+resource "google_compute_address" "gateway_ip" {
+  name         = "linktracker-gateway-ip"
+  region       = "us-central1"
+  address_type = "EXTERNAL"
+  project      = var.project_id
+}
