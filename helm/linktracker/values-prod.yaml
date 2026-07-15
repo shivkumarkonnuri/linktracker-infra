@@ -1,6 +1,6 @@
 # PROD overrides - GKE cluster
 namespace: linktracker-prod
-baseUrl: "http://146-148-61-34.nip.io"
+baseUrl: "https://146-148-61-34.nip.io"
 imagePullPolicy: Always
 
 backend:
