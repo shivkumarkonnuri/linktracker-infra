@@ -4,12 +4,13 @@ kind: Gateway
 metadata:
   name: linktracker-gateway
   namespace: {{ .Values.namespace }}
-  {{- if .Values.gateway.staticIpName }}
-  annotations:
-    networking.gke.io/addresses: {{ .Values.gateway.staticIpName | quote }}
-  {{- end }}
 spec:
   gatewayClassName: {{ .Values.gateway.className }}
+  {{- if .Values.gateway.staticIpName }}
+  addresses:
+    - type: NamedAddress
+      value: {{ .Values.gateway.staticIpName | quote }}
+  {{- end }}
   listeners:
     - name: http
       protocol: HTTP
@@ -17,6 +18,20 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
+    {{- if .Values.gateway.tls.enabled }}
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.gateway.hostname | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ .Values.gateway.tls.secretName }}
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Same
+    {{- end }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
