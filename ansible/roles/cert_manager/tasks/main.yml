@@ -31,20 +31,19 @@
       status: "True"
     wait_timeout: 180
 
-- name: Confirm enable-gateway-api flag is present on controller
+- name: Confirm Gateway API support is present in the mounted controller config
   kubernetes.core.k8s_info:
-    kind: Deployment
-    name: cert-manager
+    kind: ConfigMap
+    name: "{{ cert_manager_release_name }}"
     namespace: "{{ cert_manager_namespace }}"
-  register: cert_manager_deploy
+  register: cert_manager_config
 
-- name: Assert Gateway API flag actually made it into the running container args
+- name: Assert enableGatewayAPI is set in the controller ConfigMap
   ansible.builtin.assert:
     that: >-
-      cert_manager_deploy.resources[0].spec.template.spec.containers[0].args
-      | select('search', '--enable-gateway-api=true') | list | length > 0
+      'enableGatewayAPI' in (cert_manager_config.resources[0].data | string)
+      and 'true' in (cert_manager_config.resources[0].data | string)
     fail_msg: >-
-      cert-manager was installed but --enable-gateway-api=true is missing
-      from the controller args. Check the cert-manager chart version
-      supports config.enableGatewayAPI (v1.15+).
-    success_msg: "cert-manager Gateway API support confirmed enabled."
+      cert-manager ConfigMap does not appear to contain enableGatewayAPI: true.
+      Check the chart version supports config.enableGatewayAPI (v1.15+).
+    success_msg: "cert-manager Gateway API support confirmed enabled in controller config."
