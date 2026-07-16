@@ -4,15 +4,14 @@ metadata:
   name: observability
   namespace: argocd
   finalizers:
-    - resource-finalizer.argocd.argoproj.io
-
+    - resources-finalizer.argocd.argoproj.io
 spec:
   description: >-
     Platform-level observability stack (Prometheus, Grafana, Alertmanager,
     Loki) for the LinkTracker environment. Kept separate from the
     'linktracker' AppProject since this manages cluster-wide monitoring
     infrastructure, not the application itself.
-  
+
   sourceRepos:
     - https://github.com/shivkumarkonnuri/linktracker-infra
 
@@ -22,26 +21,9 @@ spec:
     - namespace: argocd
       server: https://kubernetes.default.svc
 
-  # kube-prometheus-stack installs CRDs, ClusterRoles, webhook configs, and
-  # a PriorityClass — all cluster-scoped. Explicitly whitelisting the kinds
-  # it needs (rather than a blanket '*') keeps this project's blast radius
-  # documented and intentional.
-  
   clusterResourceWhitelist:
-    - group: ""
-      kind: Namespace
-    - group: apiextensions.k8s.io
-      kind: CustomResourceDefinition
-    - group: rbac.authorization.k8s.io
-      kind: ClusterRole
-    - group: rbac.authorization.k8s.io
-      kind: ClusterRoleBinding
-    - group: admissionregistration.k8s.io
-      kind: MutatingWebhookConfiguration
-    - group: scheduling.k8s.io
-      kind: PriorityClass
-    - group: monitoring.coreos.com
-      kind: "*"
+    - group: '*'
+      kind: '*'
 
   namespaceResourceWhitelist:
     - group: '*'

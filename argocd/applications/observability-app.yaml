@@ -1,20 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observabiltiy
+  name: observability
   namespace: argocd
   finalizers:
     - resource-finalizer.argocd.argoproj.io
-
 spec:
   project: observability
 
   source:
-    repoUrl: https://github.com/shivkumarkonnuri/linktracker-infra
+    repoURL: https://github.com/shivkumarkonnuri/linktracker-infra
     targetRevision: main
     path: observability/kube-prometheus-stack
     helm:
-      valueFile:
+      valueFiles:
         - values.yaml
 
   destination:
@@ -26,8 +25,5 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace: true
-      # kube-prometheus-stack's CRDs can be large; ServerSideApply avoids
-      # the "metadata.annotations: Too long" error that kubectl's
-      # client-side apply sometimes hits on this chart specifically.
-      - ServerSideApply: true
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -25,18 +25,12 @@ kube-prometheus-stack:
       storageSpec:
         volumeClaimTemplate:
           spec:
-            # GKE Standard's default StorageClass. Confirm with
-            # `kubectl get storageclass` if this cluster's default differs.
             storageClassName: standard-rwo
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
                 storage: 10Gi
 
-  # --- Reuse cert-manager (already installed via the Ansible cert_manager
-  # role) for the Prometheus Operator's own admission webhook TLS, instead
-  # of the chart's default self-signed-cert bootstrap Job. Keeps TLS
-  # issuance consistent with the rest of the cluster.
   prometheusOperator:
     admissionWebhooks:
       certManager:
@@ -48,9 +42,6 @@ kube-prometheus-stack:
       limits:
         memory: 256Mi
 
-  # --- Grafana: no adminPassword set deliberately. The chart auto-generates
-  # a random one into a Secret, same pattern as ArgoCD's initial admin
-  # secret you're already used to retrieving via kubectl.
   grafana:
     persistence:
       enabled: true
@@ -64,9 +55,6 @@ kube-prometheus-stack:
         memory: 256Mi
     defaultDashboardsTimezone: Asia/Kolkata
 
-  # --- Modest node pool (e2-standard-2, 1-3 autoscaled nodes) already
-  # running linktracker + ArgoCD + cert-manager. Trim components not
-  # needed for a single-app learning environment to leave headroom.
   windowsMonitoring:
     enabled: false
 
@@ -84,3 +72,18 @@ kube-prometheus-stack:
 
   kubeStateMetrics:
     enabled: true
+
+  # --- GKE is a managed control plane: these components aren't reachable
+  # for scraping the way they are on self-managed clusters, and enabling
+  # them just creates broken Service objects in kube-system. Standard
+  # recommendation for GKE/EKS/AKS.
+  kubeControllerManager:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  coreDns:
+    enabled: false
