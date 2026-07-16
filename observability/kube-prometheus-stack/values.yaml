@@ -1,0 +1,86 @@
+# Values passed through to the kube-prometheus-stack subchart.
+# Nest everything under kube-prometheus-stack: since that's the
+# dependency alias in Chart.yaml.
+
+kube-prometheus-stack:
+
+  # --- Critical: without this, Prometheus only picks up ServiceMonitors
+  # that carry the chart's own release label. We want it to discover ANY
+  # ServiceMonitor in the cluster (e.g. the one we add to the linktracker
+  # chart), so set this to false.
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+
+      retention: 7d
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          memory: 1Gi
+
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            # GKE Standard's default StorageClass. Confirm with
+            # `kubectl get storageclass` if this cluster's default differs.
+            storageClassName: standard-rwo
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+
+  # --- Reuse cert-manager (already installed via the Ansible cert_manager
+  # role) for the Prometheus Operator's own admission webhook TLS, instead
+  # of the chart's default self-signed-cert bootstrap Job. Keeps TLS
+  # issuance consistent with the rest of the cluster.
+  prometheusOperator:
+    admissionWebhooks:
+      certManager:
+        enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+
+  # --- Grafana: no adminPassword set deliberately. The chart auto-generates
+  # a random one into a Secret, same pattern as ArgoCD's initial admin
+  # secret you're already used to retrieving via kubectl.
+  grafana:
+    persistence:
+      enabled: true
+      storageClassName: standard-rwo
+      size: 2Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+    defaultDashboardsTimezone: Asia/Kolkata
+
+  # --- Modest node pool (e2-standard-2, 1-3 autoscaled nodes) already
+  # running linktracker + ArgoCD + cert-manager. Trim components not
+  # needed for a single-app learning environment to leave headroom.
+  windowsMonitoring:
+    enabled: false
+
+  alertmanager:
+    alertmanagerSpec:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+  nodeExporter:
+    enabled: true
+
+  kubeStateMetrics:
+    enabled: true

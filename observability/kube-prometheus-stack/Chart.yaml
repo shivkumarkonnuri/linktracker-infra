@@ -1,0 +1,13 @@
+apiVersion: v2
+name: linktracker-observability
+description: >-
+  Wraps kube-prometheus-stack (Prometheus, Grafana, Alertmanager) for the
+  LinkTracker environment, so ArgoCD can manage it via the linktracker-infra
+  repo like everything else, instead of pulling directly from the
+  prometheus-community chart repo as a separate ArgoCD sourceRepo.
+version: 0.1.0
+dependencies:
+  - name: kube-prometheus-stack
+    version: "87.16.1"
+    repository: "https://prometheus-community.github.io/helm-charts"
+

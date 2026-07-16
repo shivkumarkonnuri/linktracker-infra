@@ -1,0 +1,20 @@
+{{- if .Values.observability.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-metrics
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespace }}
+  endpoints:
+    - port: {{ .Values.observability.metricsPortName | default "http" }}
+      path: /metrics
+      interval: 15s
+{{- end }}
