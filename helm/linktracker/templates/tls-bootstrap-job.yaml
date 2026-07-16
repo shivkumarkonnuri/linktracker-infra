@@ -1,0 +1,87 @@
+{{- if .Values.gateway.tls.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tls-bootstrap
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      name: tls-bootstrap
+    spec:
+      restartPolicy: Never
+      serviceAccountName: tls-bootstrap
+      containers:
+        - name: bootstrap
+          image: bitnami/kubectl:1.30
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              SECRET_NAME="{{ .Values.gateway.tls.secretName }}"
+              NAMESPACE="{{ .Values.namespace }}"
+
+              if kubectl get secret "$SECRET_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
+                echo "Secret $SECRET_NAME already exists, nothing to bootstrap."
+                exit 0
+              fi
+
+              echo "Secret $SECRET_NAME not found. Creating throwaway self-signed cert"
+              echo "so the Gateway can program while cert-manager solves the real challenge."
+
+              apk add --no-cache openssl >/dev/null 2>&1 || true
+
+              openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+                -keyout /tmp/tls.key -out /tmp/tls.crt \
+                -subj "/CN={{ .Values.gateway.hostname }}"
+
+              kubectl create secret tls "$SECRET_NAME" \
+                --cert=/tmp/tls.crt --key=/tmp/tls.key \
+                -n "$NAMESPACE"
+
+              echo "Bootstrap secret created. cert-manager will replace it shortly."
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tls-bootstrap
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tls-bootstrap
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tls-bootstrap
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+subjects:
+  - kind: ServiceAccount
+    name: tls-bootstrap
+    namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: tls-bootstrap
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
