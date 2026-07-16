@@ -1,6 +1,6 @@
 # PROD overrides - GKE cluster
 namespace: linktracker-prod
-baseUrl: "https://146-148-61-34.nip.io"
+baseUrl: "https://136-113-16-41.nip.io"
 imagePullPolicy: Always
 
 backend:
@@ -29,7 +29,7 @@ gateway:
   enabled: true
   className: gke-l7-regional-external-managed
   staticIpName: linktracker-gateway-ip
-  hostname: "146-148-61-34.nip.io"   # e.g. 35-209-77-35.nip.io — nip.io also supports dash format
+  hostname: "136-113-16-41.nip.io"   # e.g. 35-209-77-35.nip.io — nip.io also supports dash format
   tls:
     enabled: true
     secretName: linktracker-tls
