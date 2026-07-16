@@ -1,0 +1,11 @@
+---
+cert_manager_namespace: cert-manager
+cert_manager_chart_version: "v1.21.0"
+cert_manager_release_name: cert-manager
+cert_manager_enable_gateway_api: true
+
+# Set true if you want this role to also apply the ClusterIssuer
+# (letsencrypt-prod) directly. Leave false if ArgoCD/Helm already
+# manages it via linktracker-infra's own chart, to avoid two owners
+# fighting over the same resource.
+cert_manager_manage_cluster_issuer: false

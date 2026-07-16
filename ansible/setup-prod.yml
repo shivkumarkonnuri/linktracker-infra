@@ -1,0 +1,7 @@
+---
+- name: Bootstrap prod-only cluster add-ons (GKE)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - cert_manager
