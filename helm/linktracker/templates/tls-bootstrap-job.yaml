@@ -17,7 +17,7 @@ spec:
       serviceAccountName: tls-bootstrap
       containers:
         - name: bootstrap
-          image: bitnami/kubectl:1.30
+          image: alpine/k8s:1.30.4
           command:
             - sh
             - -c
