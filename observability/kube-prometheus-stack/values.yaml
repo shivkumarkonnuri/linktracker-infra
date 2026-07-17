@@ -34,7 +34,7 @@ kube-prometheus-stack:
   prometheusOperator:
     admissionWebhooks:
       certManager:
-        enabled: true
+        enabled: false
     resources:
       requests:
         cpu: 100m
