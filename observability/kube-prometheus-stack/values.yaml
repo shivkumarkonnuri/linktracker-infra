@@ -35,6 +35,8 @@ kube-prometheus-stack:
     admissionWebhooks:
       certManager:
         enabled: false
+      patch:
+        enabled: true
     resources:
       requests:
         cpu: 100m
