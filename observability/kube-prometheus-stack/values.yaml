@@ -46,6 +46,8 @@ kube-prometheus-stack:
 
   grafana:
     adminPassword: "NewStrongPassword123!"
+    deploymentStrategy:
+      type: Recreate
     persistence:
       enabled: true
       storageClassName: standard-rwo
