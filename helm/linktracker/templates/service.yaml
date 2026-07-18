@@ -10,24 +10,23 @@ spec:
   ports:
     - port: {{ .Values.postgres.port }}
       targetPort: {{ .Values.postgres.port }}
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
   namespace: {{ .Values.namespace }}
+  labels:
+    app: backend
 spec:
   type: ClusterIP
   selector:
     app: backend
   ports:
-    - port: {{ .Values.backend.port }}
+    - name: http
+      port: {{ .Values.backend.port }}
       targetPort: {{ .Values.backend.port }}
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -40,9 +39,7 @@ spec:
   ports:
     - port: {{ .Values.frontend.port }}
       targetPort: {{ .Values.frontend.port }}
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
