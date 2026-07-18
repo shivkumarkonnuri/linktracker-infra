@@ -1,0 +1,11 @@
+apiVersion: v2
+name: linktracker-loki-stack
+description: >-
+  Wraps loki-stack (Loki + Promtail) for the LinkTracker environment,
+  so ArgoCD can manage it via the linktracker-infra repo, same GitOps
+  pattern as the kube-prometheus-stack wrapper.
+version: 0.1.0
+dependencies:
+  - name: loki-stack
+    version: "2.10.2"
+    repository: "https://grafana.github.io/helm-charts"

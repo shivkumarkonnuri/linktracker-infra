@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki-stack
+  namespace: argocd
+  finalizers:
+    - resource-finalizer.argocd.argoproj.io
+spec:
+  project: observability
+
+  source:
+    repoURL: https://github.com/shivkumarkonnuri/linktracker-infra
+    targetRevision: main
+    path: observability/loki-stack
+    helm:
+      valueFiles:
+        - values.yaml
+      skipCrds: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

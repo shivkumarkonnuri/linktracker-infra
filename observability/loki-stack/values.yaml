@@ -1,0 +1,44 @@
+# Values passed through to the loki-stack subchart.
+# Nest everything under loki-stack: since that's the dependency alias
+# in Chart.yaml.
+
+loki-stack:
+
+  loki:
+    enabled: true
+    persistence:
+      enabled: true
+      storageClassName: standard-rwo
+      size: 10Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 512Mi
+    config:
+      # 7-day retention to match Prometheus's retention window
+      table_manager:
+        retention_deletes_enabled: true
+        retention_period: 168h
+
+  promtail:
+    enabled: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+    # Default config already tails all pod logs across all namespaces
+    # via the Kubernetes service discovery — no extra scrape config
+    # needed for a single-cluster setup like this one.
+
+  # We already have kube-prometheus-stack's Grafana deployed separately —
+  # don't deploy a second Grafana instance from this chart.
+  grafana:
+    enabled: false
+
+  # Same reasoning — Prometheus already exists from the other stack.
+  prometheus:
+    enabled: false
