@@ -45,6 +45,7 @@ kube-prometheus-stack:
         memory: 256Mi
 
   grafana:
+    adminPassword: "NewStrongPassword123!"
     persistence:
       enabled: true
       storageClassName: standard-rwo
