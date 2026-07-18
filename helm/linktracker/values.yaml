@@ -98,3 +98,7 @@ networkPolicy:
 gateway:
   enabled: false
   className: gke-l7-regional-external-managed
+# ----- Observability --------------------------------------------------------------------------------
+observability:
+  enabled: true
+  metricsPortName: http
