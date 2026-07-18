@@ -4,7 +4,7 @@ baseUrl: "https://136-113-16-41.nip.io"
 imagePullPolicy: Always
 
 backend:
-  image: shivkumarkonnuri/linktracker:backend
+  image: shivkumarkonnuri/linktracker:backend-fc4db3c
   replicas: 2
   hpa:
     enabled: true
@@ -13,10 +13,10 @@ backend:
     targetCPUUtilizationPercentage: 60
 
 worker:
-  image: shivkumarkonnuri/linktracker:worker
+  image: shivkumarkonnuri/linktracker:worker-fc4db3c
 
 frontend:
-  image: shivkumarkonnuri/linktracker:frontend
+  image: shivkumarkonnuri/linktracker:frontend-fc4db3c
 
 configmap:
   dbUrl: "postgresql://linktracker:linktracker@postgres:5432/linktracker"
